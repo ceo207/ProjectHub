@@ -11,7 +11,11 @@
     "projects": "المشاريع",
     "workLogs": "سجلات العمل",
     "hardwareCosts": "تكاليف الأجهزة",
-    "smartSearch": "البحث الذكي"
+    "groups": {
+      "overview": "نظرة عامة",
+      "operations": "العمليات",
+      "management": "الإدارة"
+    }
   },
   "common": {
     "save": "حفظ",
@@ -186,26 +190,6 @@
     "purchaseDate": "تاريخ الشراء",
     "selectProject": "اختر مشروعاً",
     "filterByProject": "تصفية بالمشروع"
-  },
-  "smartSearch": {
-    "title": "البحث الذكي",
-    "subtitle": "ابحث في المشاريع والموظفين للحصول على رؤى فورية",
-    "placeholder": "ابحث بالاسم، العميل، الدور الوظيفي...",
-    "filterByType": "تصفية حسب النوع",
-    "allResults": "جميع النتائج",
-    "projectResults": "المشاريع",
-    "employeeResults": "الموظفون",
-    "projectSummary": "ملخص المشروع",
-    "employeeSummary": "ملخص الموظف",
-    "startDate": "تاريخ البدء",
-    "totalCost": "إجمالي التكلفة",
-    "assignedEmployees": "حجم الفريق",
-    "completionPct": "نسبة الإنجاز",
-    "totalHours": "إجمالي الساعات",
-    "totalEarnings": "إجمالي الأرباح",
-    "assignedProjects": "المشاريع المُعيَّنة",
-    "noResults": "لا نتائج لـ \"{{query}}\"",
-    "typeToSearch": "اكتب حرفاً واحداً على الأقل للبحث"
   },
   "language": {
     "en": "الإنجليزية",

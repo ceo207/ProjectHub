@@ -11,7 +11,11 @@
     "projects": "Projects",
     "workLogs": "Work Logs",
     "hardwareCosts": "Hardware Costs",
-    "smartSearch": "Smart Search"
+    "groups": {
+      "overview": "Overview",
+      "operations": "Operations",
+      "management": "Management"
+    }
   },
   "common": {
     "save": "Save",
@@ -186,26 +190,6 @@
     "purchaseDate": "Purchase Date",
     "selectProject": "Select project",
     "filterByProject": "Filter by project"
-  },
-  "smartSearch": {
-    "title": "Smart Search",
-    "subtitle": "Search projects and employees to get instant insights",
-    "placeholder": "Search by name, client, role...",
-    "filterByType": "Filter by type",
-    "allResults": "All Results",
-    "projectResults": "Projects",
-    "employeeResults": "Employees",
-    "projectSummary": "Project Summary",
-    "employeeSummary": "Employee Summary",
-    "startDate": "Start Date",
-    "totalCost": "Total Cost",
-    "assignedEmployees": "Team Size",
-    "completionPct": "Completion",
-    "totalHours": "Total Hours",
-    "totalEarnings": "Total Earnings",
-    "assignedProjects": "Projects Assigned",
-    "noResults": "No results found for \"{{query}}\"",
-    "typeToSearch": "Type at least 1 character to search"
   },
   "language": {
     "en": "English",

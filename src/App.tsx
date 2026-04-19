@@ -10,8 +10,6 @@ import Projects from "@/pages/Projects";
 import ProjectDetails from "@/pages/ProjectDetails";
 import WorkLogs from "@/pages/WorkLogs";
 import HardwareCosts from "@/pages/HardwareCosts";
-import SmartSearch from "@/pages/SmartSearch";
-
 export default function App() {
   const { t } = useTranslation();
   const [dbReady, setDbReady] = useState(false);
@@ -54,7 +52,6 @@ export default function App() {
           <Route path="/projects/:id"   element={<ProjectDetails />} />
           <Route path="/work-logs"      element={<WorkLogs />} />
           <Route path="/hardware-costs" element={<HardwareCosts />} />
-          <Route path="/smart-search"   element={<SmartSearch />} />
         </Routes>
       </Layout>
     </BrowserRouter>
