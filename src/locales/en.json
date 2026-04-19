@@ -100,7 +100,8 @@
     "totalEarnings": "Total Earnings",
     "totalHours": "Total Hours",
     "assignedProjects": "Projects",
-    "selectStatus": "Select status"
+    "selectStatus": "Select status",
+    "downloadTemplate": "Timesheet Template"
   },
   "projects": {
     "title": "Projects",

@@ -100,7 +100,8 @@
     "totalEarnings": "إجمالي الأرباح",
     "totalHours": "إجمالي الساعات",
     "assignedProjects": "المشاريع",
-    "selectStatus": "اختر الحالة"
+    "selectStatus": "اختر الحالة",
+    "downloadTemplate": "نموذج ساعات العمل"
   },
   "projects": {
     "title": "المشاريع",
