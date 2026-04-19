@@ -4,7 +4,7 @@ import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer,
 } from "recharts";
-import { Users, FolderKanban, DollarSign, TrendingUp, RefreshCw, Database } from "lucide-react";
+import { Users, FolderKanban, DollarSign, TrendingUp, Database } from "lucide-react";
 import { StatCard } from "@/components/shared/StatCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -72,20 +72,14 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">{t("dashboard.title")}</h2>
-        <div className="flex gap-2">
-          {canSeed && (
-            <Button variant="outline" size="sm" onClick={handleSeed} disabled={seeding} className="gap-2">
-              <Database className="h-4 w-4" />
-              {seeding ? t("seed.loading") : t("seed.loadSampleData")}
-            </Button>
-          )}
-          <Button variant="ghost" size="icon" onClick={load}>
-            <RefreshCw className="h-4 w-4" />
+      {canSeed && (
+        <div className="flex justify-end">
+          <Button variant="outline" size="sm" onClick={handleSeed} disabled={seeding} className="gap-2">
+            <Database className="h-4 w-4" />
+            {seeding ? t("seed.loading") : t("seed.loadSampleData")}
           </Button>
         </div>
-      </div>
+      )}
 
       {/* Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

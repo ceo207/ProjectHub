@@ -4,27 +4,28 @@ import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher";
 
 const routeTitleMap: Record<string, string> = {
   "/dashboard":      "nav.dashboard",
-  "/employees":      "nav.employees",
+  "/projects/":      "projectDetails.title",
   "/projects":       "nav.projects",
+  "/employees":      "nav.employees",
   "/work-logs":      "nav.workLogs",
   "/hardware-costs": "nav.hardwareCosts",
-  "/smart-search":   "nav.smartSearch",
 };
 
 export default function TopBar() {
   const { t } = useTranslation();
   const { pathname } = useLocation();
 
-  const titleKey = Object.entries(routeTitleMap).find(([path]) =>
-    pathname.startsWith(path)
-  )?.[1] ?? "app.name";
+  const titleKey =
+    Object.entries(routeTitleMap).find(([path]) => pathname.startsWith(path))?.[1] ??
+    "app.name";
 
   return (
-    <header className="h-16 border-b bg-background px-6 flex items-center justify-between flex-shrink-0">
-      <h1 className="text-lg font-semibold text-foreground">{t(titleKey)}</h1>
+    <header className="h-16 border-b bg-background flex-shrink-0 px-6 flex items-center justify-between">
       <div className="flex items-center gap-3">
-        <LanguageSwitcher />
+        <span className="w-1 h-6 rounded-full bg-primary block" />
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">{t(titleKey)}</h1>
       </div>
+      <LanguageSwitcher />
     </header>
   );
 }

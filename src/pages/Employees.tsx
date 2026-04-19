@@ -140,24 +140,27 @@ export default function Employees() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">{t("employees.title")}</h2>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => downloadWorkingHoursTemplate()} className="gap-2">
-            <Download className="h-4 w-4" />
-            {t("employees.downloadTemplate")}
-          </Button>
-          <Button onClick={openAdd} className="gap-2">
-            <PlusCircle className="h-4 w-4" />
-            {t("employees.addEmployee")}
-          </Button>
-        </div>
-      </div>
-
       {loading ? (
         <p className="text-muted-foreground">{t("common.loading")}</p>
       ) : (
-        <DataTable columns={columns} data={employees} searchKey="name" searchPlaceholder={t("common.search")} />
+        <DataTable
+          columns={columns}
+          data={employees}
+          searchKey="name"
+          searchPlaceholder={t("common.search")}
+          toolbar={
+            <>
+              <Button variant="outline" onClick={() => downloadWorkingHoursTemplate()} className="gap-2">
+                <Download className="h-4 w-4" />
+                {t("employees.downloadTemplate")}
+              </Button>
+              <Button onClick={openAdd} className="gap-2">
+                <PlusCircle className="h-4 w-4" />
+                {t("employees.addEmployee")}
+              </Button>
+            </>
+          }
+        />
       )}
 
       {/* Add/Edit Dialog */}

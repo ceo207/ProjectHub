@@ -207,13 +207,13 @@ export default function ProjectDetails() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate("/projects")}>
+      <div className="flex items-center gap-3 pb-2 border-b">
+        <Button variant="ghost" size="icon" onClick={() => navigate("/projects")} className="-ms-1 flex-shrink-0">
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <div className="flex-1">
-          <h2 className="text-2xl font-bold">{project.name}</h2>
-          <p className="text-muted-foreground text-sm">{project.client ?? "-"}</p>
+        <div className="flex-1 min-w-0">
+          <p className="text-lg font-bold truncate">{project.name}</p>
+          {project.client && <p className="text-xs text-muted-foreground truncate">{project.client}</p>}
         </div>
         <StatusBadge status={project.status} />
       </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, ReactNode } from "react";
 import {
   ColumnDef,
   flexRender,
@@ -22,6 +22,7 @@ interface DataTableProps<TData, TValue> {
   searchKey?: string;
   searchPlaceholder?: string;
   pageSize?: number;
+  toolbar?: ReactNode;
 }
 
 export function DataTable<TData, TValue>({
@@ -30,6 +31,7 @@ export function DataTable<TData, TValue>({
   searchKey,
   searchPlaceholder,
   pageSize = 10,
+  toolbar,
 }: DataTableProps<TData, TValue>) {
   const { t } = useTranslation();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -50,13 +52,18 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
-      {searchKey && (
-        <Input
-          placeholder={searchPlaceholder ?? t("common.search")}
-          value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
-          onChange={(e) => table.getColumn(searchKey)?.setFilterValue(e.target.value)}
-          className="max-w-sm"
-        />
+      {(searchKey || toolbar) && (
+        <div className="flex items-center justify-between gap-4">
+          {searchKey ? (
+            <Input
+              placeholder={searchPlaceholder ?? t("common.search")}
+              value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
+              onChange={(e) => table.getColumn(searchKey)?.setFilterValue(e.target.value)}
+              className="max-w-sm"
+            />
+          ) : <span />}
+          {toolbar && <div className="flex items-center gap-2">{toolbar}</div>}
+        </div>
       )}
       <div className="rounded-md border">
         <Table>

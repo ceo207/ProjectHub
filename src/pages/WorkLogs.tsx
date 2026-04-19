@@ -128,18 +128,21 @@ export default function WorkLogs() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">{t("workLogs.title")}</h2>
-        <Button onClick={openAdd} className="gap-2">
-          <PlusCircle className="h-4 w-4" />
-          {t("workLogs.addWorkLog")}
-        </Button>
-      </div>
-
       {loading ? (
         <p className="text-muted-foreground">{t("common.loading")}</p>
       ) : (
-        <DataTable columns={columns} data={logs} searchKey="employeeName" searchPlaceholder={t("common.search")} />
+        <DataTable
+          columns={columns}
+          data={logs}
+          searchKey="employeeName"
+          searchPlaceholder={t("common.search")}
+          toolbar={
+            <Button onClick={openAdd} className="gap-2">
+              <PlusCircle className="h-4 w-4" />
+              {t("workLogs.addWorkLog")}
+            </Button>
+          }
+        />
       )}
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
