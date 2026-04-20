@@ -79,7 +79,8 @@ export default function ProjectDetails() {
     purchaseDate: z.string().min(1, t("validation.required")),
   });
 
-  const reqForm = useForm({ resolver: zodResolver(reqSchema), defaultValues: { title: "", description: "", status: "todo" as const, assignedEmployeeId: null, progress: 0 } });
+  type ReqFormValues = z.infer<typeof reqSchema>;
+  const reqForm = useForm<ReqFormValues>({ resolver: zodResolver(reqSchema), defaultValues: { title: "", description: "", status: "todo", assignedEmployeeId: null, progress: 0 } });
   const logForm = useForm({ resolver: zodResolver(logSchema), defaultValues: { employeeId: 0, date: todayDate(), hoursWorked: 8, notes: "" } });
   const hwForm  = useForm({ resolver: zodResolver(hwSchema), defaultValues: { itemName: "", quantity: 1, unitPrice: 0, purchaseDate: todayDate() } });
 

@@ -27,7 +27,7 @@
   },
   "bundle": {
     "active": true,
-    "targets": "all",
+    "targets": ["nsis", "msi"],
     "resources": {
       "resources/working-hours-template.xlsx": "resources/working-hours-template.xlsx"
     },
@@ -37,6 +37,15 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "windows": {
+      "webviewInstallMode": {
+        "type": "offlineInstaller",
+        "silent": true
+      },
+      "nsis": {
+        "installMode": "currentUser"
+      }
+    }
   }
 }
