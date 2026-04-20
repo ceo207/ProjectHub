@@ -5,7 +5,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { PlusCircle, Pencil, Trash2, Eye } from "lucide-react";
+import { PlusCircle, Pencil, Trash2 } from "lucide-react";
 import { DataTable, SortableHeader } from "@/components/shared/DataTable";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
@@ -22,12 +22,10 @@ import type { ProjectWithCosts } from "@/types";
 
 const projectSchema = (t: (k: string) => string) =>
   z.object({
-    name:            z.string().min(1, t("validation.required")),
-    description:     z.string().optional(),
-    client:          z.string().optional(),
-    startDate:       z.string().min(1, t("validation.required")),
-    status:          z.enum(["planning", "active", "completed", "on_hold"]),
-    estimatedBudget: z.coerce.number().min(0).optional(),
+    name:        z.string().min(1, t("validation.required")),
+    description: z.string().optional(),
+    startDate:   z.string().min(1, t("validation.required")),
+    status:      z.enum(["planning", "active", "completed", "on_hold"]),
   });
 
 type ProjectFormValues = z.infer<ReturnType<typeof projectSchema>>;
@@ -45,7 +43,7 @@ export default function Projects() {
   const schema = projectSchema(t);
   const form = useForm<ProjectFormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { name: "", description: "", client: "", startDate: todayDate(), status: "planning", estimatedBudget: undefined },
+    defaultValues: { name: "", description: "", startDate: todayDate(), status: "planning" },
   });
 
   const load = useCallback(async () => {
@@ -58,13 +56,13 @@ export default function Projects() {
 
   const openAdd = () => {
     setEditTarget(null);
-    form.reset({ name: "", description: "", client: "", startDate: todayDate(), status: "planning" });
+    form.reset({ name: "", description: "", startDate: todayDate(), status: "planning" });
     setDialogOpen(true);
   };
 
   const openEdit = (p: ProjectWithCosts) => {
     setEditTarget(p);
-    form.reset({ name: p.name, description: p.description ?? "", client: p.client ?? "", startDate: p.startDate, status: p.status, estimatedBudget: p.estimatedBudget ?? undefined });
+    form.reset({ name: p.name, description: p.description ?? "", startDate: p.startDate, status: p.status });
     setDialogOpen(true);
   };
 
@@ -95,7 +93,6 @@ export default function Projects() {
       accessorKey: "name",
       header: ({ column }) => <SortableHeader column={column} label={t("projects.name")} />,
     },
-    { accessorKey: "client", header: t("projects.client"), cell: ({ row }) => row.original.client ?? "-" },
     {
       accessorKey: "status",
       header: t("projects.status"),
@@ -114,7 +111,7 @@ export default function Projects() {
     {
       accessorKey: "totalCost",
       header: ({ column }) => <SortableHeader column={column} label={t("projects.totalCost")} />,
-      cell: ({ row }) => <span className="font-semibold">{formatCurrency(row.original.totalCost)}</span>,
+      cell: ({ row }) => <span className="font-semibold text-emerald-600">{formatCurrency(row.original.totalCost)}</span>,
     },
     {
       accessorKey: "completionPct",
@@ -135,15 +132,14 @@ export default function Projects() {
       id: "actions",
       header: t("common.actions"),
       cell: ({ row }) => (
-        <div className="flex gap-1">
-          <Button size="icon" variant="ghost" onClick={() => navigate(`/projects/${row.original.id}`)}>
-            <Eye className="h-4 w-4" />
+        <div className="flex gap-1.5 justify-center">
+          <Button size="icon" variant="ghost" onClick={(e) => { e.stopPropagation(); openEdit(row.original); }}
+            className="h-8 w-8 text-amber-600 bg-amber-50 hover:bg-amber-100 hover:text-amber-700">
+            <Pencil className="h-3.5 w-3.5" />
           </Button>
-          <Button size="icon" variant="ghost" onClick={() => openEdit(row.original)}>
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <Button size="icon" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => setDeleteTarget(row.original)}>
-            <Trash2 className="h-4 w-4" />
+          <Button size="icon" variant="ghost" onClick={(e) => { e.stopPropagation(); setDeleteTarget(row.original); }}
+            className="h-8 w-8 text-red-600 bg-red-50 hover:bg-red-100 hover:text-red-700">
+            <Trash2 className="h-3.5 w-3.5" />
           </Button>
         </div>
       ),
@@ -166,6 +162,8 @@ export default function Projects() {
               {t("projects.addProject")}
             </Button>
           }
+          onRowClick={(p) => navigate(`/projects/${p.id}`)}
+          rowClassName="hover:bg-blue-50 hover:[box-shadow:inset_4px_0_0_#60a5fa]"
         />
       )}
 
@@ -180,13 +178,6 @@ export default function Projects() {
                 <FormField control={form.control} name="name" render={({ field }) => (
                   <FormItem className="col-span-2">
                     <FormLabel>{t("projects.name")}</FormLabel>
-                    <FormControl><Input {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="client" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("projects.client")} <span className="text-muted-foreground text-xs">({t("common.optional")})</span></FormLabel>
                     <FormControl><Input {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
@@ -210,13 +201,6 @@ export default function Projects() {
                   <FormItem>
                     <FormLabel>{t("projects.startDate")}</FormLabel>
                     <FormControl><Input type="date" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="estimatedBudget" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("projects.estimatedBudget")} <span className="text-muted-foreground text-xs">({t("common.optional")})</span></FormLabel>
-                    <FormControl><Input type="number" step="0.01" min="0" {...field} value={field.value ?? ""} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />

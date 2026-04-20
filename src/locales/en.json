@@ -133,6 +133,7 @@
     "addRequirement": "Add Requirement",
     "assignEmployee": "Assign Employee",
     "unassignEmployee": "Remove",
+    "unassignConfirm": "Are you sure you want to remove this employee from the project?",
     "assignedSince": "Assigned",
     "noTeam": "No employees assigned",
     "noRequirements": "No requirements yet",
@@ -172,6 +173,7 @@
     "hoursWorked": "Hours Worked",
     "notes": "Notes",
     "totalHours": "Total Hours",
+    "earning": "Earning",
     "selectEmployee": "Select employee",
     "selectProject": "Select project",
     "filterByEmployee": "Filter by employee",
@@ -205,11 +207,5 @@
     "minValue": "Must be at least {{min}}",
     "maxValue": "Must be at most {{max}}",
     "minLength": "Must be at least {{min}} characters"
-  },
-  "seed": {
-    "loadSampleData": "Load Sample Data",
-    "loading": "Loading...",
-    "success": "Sample data loaded successfully!",
-    "error": "Failed to load sample data"
   }
 }

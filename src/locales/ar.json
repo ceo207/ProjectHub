@@ -133,6 +133,7 @@
     "addRequirement": "إضافة متطلب",
     "assignEmployee": "تعيين موظف",
     "unassignEmployee": "إزالة",
+    "unassignConfirm": "هل أنت متأكد من إزالة هذا الموظف من المشروع؟",
     "assignedSince": "تاريخ التعيين",
     "noTeam": "لا يوجد موظفون معيَّنون",
     "noRequirements": "لا توجد متطلبات بعد",
@@ -172,6 +173,7 @@
     "hoursWorked": "ساعات العمل",
     "notes": "ملاحظات",
     "totalHours": "إجمالي الساعات",
+    "earning": "الأرباح",
     "selectEmployee": "اختر موظفاً",
     "selectProject": "اختر مشروعاً",
     "filterByEmployee": "تصفية بالموظف",
@@ -205,11 +207,5 @@
     "minValue": "يجب أن يكون على الأقل {{min}}",
     "maxValue": "يجب أن يكون على الأكثر {{max}}",
     "minLength": "يجب أن يكون {{min}} حروف على الأقل"
-  },
-  "seed": {
-    "loadSampleData": "تحميل بيانات نموذجية",
-    "loading": "جارٍ التحميل...",
-    "success": "تم تحميل البيانات النموذجية بنجاح!",
-    "error": "فشل في تحميل البيانات النموذجية"
   }
 }

@@ -1,25 +1,17 @@
 import { useTranslation } from "react-i18next";
-import { Button } from "@/components/ui/button";
 import { Languages } from "lucide-react";
 
 export function LanguageSwitcher() {
-  const { i18n, t } = useTranslation();
+  const { i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
 
-  const toggle = () => {
-    i18n.changeLanguage(isArabic ? "en" : "ar");
-  };
-
   return (
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={toggle}
-      className="gap-2 font-medium min-w-[90px]"
-      title={t("language.switch")}
+    <button
+      onClick={() => i18n.changeLanguage(isArabic ? "en" : "ar")}
+      className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/50 px-3 py-1.5 text-sm font-semibold text-foreground transition-all duration-150 hover:bg-slate-800 hover:text-white hover:border-slate-800"
     >
-      <Languages className="h-4 w-4" />
-      {isArabic ? t("language.switchTo") : t("language.switchTo")}
-    </Button>
+      <Languages className="h-3.5 w-3.5" />
+      {isArabic ? "EN" : "ع"}
+    </button>
   );
 }

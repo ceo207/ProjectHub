@@ -18,17 +18,17 @@ const groups = [
     ],
   },
   {
-    labelKey: "nav.groups.operations",
-    items: [
-      { to: "/work-logs",      icon: ClipboardList, key: "nav.workLogs" },
-      { to: "/hardware-costs", icon: HardDrive,     key: "nav.hardwareCosts" },
-    ],
-  },
-  {
     labelKey: "nav.groups.management",
     items: [
       { to: "/projects",  icon: FolderKanban, key: "nav.projects" },
       { to: "/employees", icon: Users,        key: "nav.employees" },
+    ],
+  },
+  {
+    labelKey: "nav.groups.operations",
+    items: [
+      { to: "/work-logs",      icon: ClipboardList, key: "nav.workLogs" },
+      { to: "/hardware-costs", icon: HardDrive,     key: "nav.hardwareCosts" },
     ],
   },
 ] as const;
@@ -40,12 +40,12 @@ export default function Sidebar() {
     <aside className="sidebar-width flex-shrink-0 bg-[hsl(var(--sidebar))] text-[hsl(var(--sidebar-foreground))] flex flex-col h-full">
       {/* Logo */}
       <div className="flex items-center gap-3 px-6 py-5 border-b border-[hsl(var(--sidebar-border))]">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-          <Briefcase className="h-4 w-4 text-white" />
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
+          <Briefcase className="h-5 w-5 text-white" />
         </div>
         <div>
-          <p className="text-sm font-bold text-white leading-none">{t("app.name")}</p>
-          <p className="text-xs text-[hsl(var(--sidebar-foreground))]/60 mt-0.5">{t("app.tagline")}</p>
+          <p className="text-lg font-bold text-white leading-none">{t("app.name")}</p>
+          <p className="text-[10px] text-[hsl(var(--sidebar-foreground))]/60 mt-1">{t("app.tagline")}</p>
         </div>
       </div>
 
@@ -81,7 +81,7 @@ export default function Sidebar() {
 
       {/* Footer */}
       <div className="px-6 py-4 border-t border-[hsl(var(--sidebar-border))]">
-        <p className="text-xs text-[hsl(var(--sidebar-foreground))]/40">v0.1.0</p>
+        <p className="text-xs text-[hsl(var(--sidebar-foreground))]/40">v1.0.0</p>
       </div>
     </aside>
   );

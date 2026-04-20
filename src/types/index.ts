@@ -88,6 +88,8 @@ export interface EmployeeWithStats extends Employee {
 export interface WorkLogWithNames extends WorkLog {
   employeeName: string;
   projectName: string;
+  hourlyRate: number;
+  earning: number;
 }
 
 export interface HardwareCostWithProject extends HardwareCost {

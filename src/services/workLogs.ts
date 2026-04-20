@@ -21,8 +21,9 @@ export async function getAllWorkLogs(): Promise<WorkLogWithNames[]> {
     created_at: string;
     employee_name: string;
     project_name: string;
+    hourly_rate: number;
   }[]>(
-    `SELECT wl.*, e.name AS employee_name, p.name AS project_name
+    `SELECT wl.*, e.name AS employee_name, e.hourly_rate, p.name AS project_name
      FROM work_logs wl
      JOIN employees e ON e.id = wl.employee_id
      JOIN projects p ON p.id = wl.project_id
@@ -40,6 +41,8 @@ export async function getAllWorkLogs(): Promise<WorkLogWithNames[]> {
     createdAt: r.created_at,
     employeeName: r.employee_name,
     projectName: r.project_name,
+    hourlyRate: r.hourly_rate,
+    earning: r.hours_worked * r.hourly_rate,
   }));
 }
 
@@ -54,8 +57,9 @@ export async function getWorkLogsByProject(projectId: number): Promise<WorkLogWi
     created_at: string;
     employee_name: string;
     project_name: string;
+    hourly_rate: number;
   }[]>(
-    `SELECT wl.*, e.name AS employee_name, p.name AS project_name
+    `SELECT wl.*, e.name AS employee_name, e.hourly_rate, p.name AS project_name
      FROM work_logs wl
      JOIN employees e ON e.id = wl.employee_id
      JOIN projects p ON p.id = wl.project_id
@@ -74,6 +78,8 @@ export async function getWorkLogsByProject(projectId: number): Promise<WorkLogWi
     createdAt: r.created_at,
     employeeName: r.employee_name,
     projectName: r.project_name,
+    hourlyRate: r.hourly_rate,
+    earning: r.hours_worked * r.hourly_rate,
   }));
 }
 

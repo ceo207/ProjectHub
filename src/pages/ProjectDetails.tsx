@@ -54,6 +54,8 @@ export default function ProjectDetails() {
   const [hwDelete, setHwDelete] = useState<HardwareCostWithProject | null>(null);
   const [assignDialog, setAssignDialog] = useState(false);
   const [assignEmpId, setAssignEmpId] = useState("");
+  const [teamDeleteTarget, setTeamDeleteTarget] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState("requirements");
   const [saving, setSaving] = useState(false);
 
   // Forms
@@ -150,6 +152,15 @@ export default function ProjectDetails() {
     await assignEmployeeToProject(projectId, Number(assignEmpId));
     setAssignDialog(false);
     setAssignEmpId("");
+    setActiveTab("team");
+    await load();
+  };
+
+  const onUnassignEmployee = async () => {
+    if (teamDeleteTarget === null) return;
+    await unassignEmployeeFromProject(projectId, teamDeleteTarget);
+    setTeamDeleteTarget(null);
+    setActiveTab("team");
     await load();
   };
 
@@ -161,6 +172,7 @@ export default function ProjectDetails() {
 
   const reqColumns: ColumnDef<RequirementWithEmployee>[] = [
     { accessorKey: "title", header: t("requirements.taskTitle") },
+    { accessorKey: "description", header: t("requirements.description"), cell: ({ row }) => <span>{row.original.description ?? "-"}</span> },
     { accessorKey: "status", header: t("requirements.status"), cell: ({ row }) => <StatusBadge status={row.original.status} /> },
     { accessorKey: "employeeName", header: t("requirements.assignedEmployee"), cell: ({ row }) => row.original.employeeName ?? <span className="text-muted-foreground">{t("requirements.unassigned")}</span> },
     { accessorKey: "progress", header: t("requirements.progress"), cell: ({ row }) => (
@@ -170,9 +182,11 @@ export default function ProjectDetails() {
       </div>
     )},
     { id: "actions", header: t("common.actions"), cell: ({ row }) => (
-      <div className="flex gap-1">
-        <Button size="icon" variant="ghost" onClick={() => { setReqEdit(row.original); reqForm.reset({ title: row.original.title, description: row.original.description ?? "", status: row.original.status, assignedEmployeeId: row.original.assignedEmployeeId ?? null, progress: row.original.progress }); setReqDialog(true); }}><Pencil className="h-4 w-4" /></Button>
-        <Button size="icon" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => setReqDelete(row.original)}><Trash2 className="h-4 w-4" /></Button>
+      <div className="flex gap-1.5 justify-center">
+        <Button size="icon" variant="ghost" onClick={() => { setReqEdit(row.original); reqForm.reset({ title: row.original.title, description: row.original.description ?? "", status: row.original.status, assignedEmployeeId: row.original.assignedEmployeeId ?? null, progress: row.original.progress }); setReqDialog(true); }}
+          className="h-8 w-8 text-amber-600 bg-amber-50 hover:bg-amber-100 hover:text-amber-700"><Pencil className="h-3.5 w-3.5" /></Button>
+        <Button size="icon" variant="ghost" onClick={() => setReqDelete(row.original)}
+          className="h-8 w-8 text-red-600 bg-red-50 hover:bg-red-100 hover:text-red-700"><Trash2 className="h-3.5 w-3.5" /></Button>
       </div>
     )},
   ];
@@ -181,11 +195,14 @@ export default function ProjectDetails() {
     { accessorKey: "employeeName", header: t("workLogs.employee") },
     { accessorKey: "date", header: t("workLogs.date"), cell: ({ row }) => formatDate(row.original.date) },
     { accessorKey: "hoursWorked", header: t("workLogs.hoursWorked"), cell: ({ row }) => <span className="font-semibold text-primary">{row.original.hoursWorked} {t("common.hours")}</span> },
+    { accessorKey: "earning", header: t("workLogs.earning"), cell: ({ row }) => <span className="font-semibold text-emerald-600">{formatCurrency(row.original.earning)}</span> },
     { accessorKey: "notes", header: t("workLogs.notes"), cell: ({ row }) => <span className="text-sm text-muted-foreground">{row.original.notes ?? "-"}</span> },
     { id: "actions", header: t("common.actions"), cell: ({ row }) => (
-      <div className="flex gap-1">
-        <Button size="icon" variant="ghost" onClick={() => { setLogEdit(row.original); logForm.reset({ employeeId: row.original.employeeId, date: row.original.date, hoursWorked: row.original.hoursWorked, notes: row.original.notes ?? "" }); setLogDialog(true); }}><Pencil className="h-4 w-4" /></Button>
-        <Button size="icon" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => setLogDelete(row.original)}><Trash2 className="h-4 w-4" /></Button>
+      <div className="flex gap-1.5 justify-center">
+        <Button size="icon" variant="ghost" onClick={() => { setLogEdit(row.original); logForm.reset({ employeeId: row.original.employeeId, date: row.original.date, hoursWorked: row.original.hoursWorked, notes: row.original.notes ?? "" }); setLogDialog(true); }}
+          className="h-8 w-8 text-amber-600 bg-amber-50 hover:bg-amber-100 hover:text-amber-700"><Pencil className="h-3.5 w-3.5" /></Button>
+        <Button size="icon" variant="ghost" onClick={() => setLogDelete(row.original)}
+          className="h-8 w-8 text-red-600 bg-red-50 hover:bg-red-100 hover:text-red-700"><Trash2 className="h-3.5 w-3.5" /></Button>
       </div>
     )},
   ];
@@ -197,9 +214,11 @@ export default function ProjectDetails() {
     { accessorKey: "totalPrice", header: t("hardwareCosts.totalPrice"), cell: ({ row }) => <span className="font-semibold text-emerald-600">{formatCurrency(row.original.totalPrice)}</span> },
     { accessorKey: "purchaseDate", header: t("hardwareCosts.purchaseDate"), cell: ({ row }) => formatDate(row.original.purchaseDate) },
     { id: "actions", header: t("common.actions"), cell: ({ row }) => (
-      <div className="flex gap-1">
-        <Button size="icon" variant="ghost" onClick={() => { setHwEdit(row.original); hwForm.reset({ itemName: row.original.itemName, quantity: row.original.quantity, unitPrice: row.original.unitPrice, purchaseDate: row.original.purchaseDate }); setHwDialog(true); }}><Pencil className="h-4 w-4" /></Button>
-        <Button size="icon" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => setHwDelete(row.original)}><Trash2 className="h-4 w-4" /></Button>
+      <div className="flex gap-1.5 justify-center">
+        <Button size="icon" variant="ghost" onClick={() => { setHwEdit(row.original); hwForm.reset({ itemName: row.original.itemName, quantity: row.original.quantity, unitPrice: row.original.unitPrice, purchaseDate: row.original.purchaseDate }); setHwDialog(true); }}
+          className="h-8 w-8 text-amber-600 bg-amber-50 hover:bg-amber-100 hover:text-amber-700"><Pencil className="h-3.5 w-3.5" /></Button>
+        <Button size="icon" variant="ghost" onClick={() => setHwDelete(row.original)}
+          className="h-8 w-8 text-red-600 bg-red-50 hover:bg-red-100 hover:text-red-700"><Trash2 className="h-3.5 w-3.5" /></Button>
       </div>
     )},
   ];
@@ -212,8 +231,7 @@ export default function ProjectDetails() {
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div className="flex-1 min-w-0">
-          <p className="text-lg font-bold truncate">{project.name}</p>
-          {project.client && <p className="text-xs text-muted-foreground truncate">{project.client}</p>}
+          <p className="text-2xl font-bold truncate">{project.name}</p>
         </div>
         <StatusBadge status={project.status} />
       </div>
@@ -250,7 +268,7 @@ export default function ProjectDetails() {
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="requirements">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="requirements">{t("projectDetails.requirements")} ({requirements.length})</TabsTrigger>
           <TabsTrigger value="team">{t("projectDetails.team")} ({teamMembers.length})</TabsTrigger>
@@ -286,8 +304,9 @@ export default function ProjectDetails() {
                       <p className="text-sm text-muted-foreground">{m.role}</p>
                       <p className="text-xs text-muted-foreground mt-1">{t("projectDetails.assignedSince")}: {formatDate(m.assigned_at)}</p>
                     </div>
-                    <Button size="icon" variant="ghost" className="text-destructive" onClick={async () => { await unassignEmployeeFromProject(projectId, m.employee_id); await load(); }}>
-                      <Trash2 className="h-4 w-4" />
+                    <Button size="icon" variant="ghost" onClick={() => setTeamDeleteTarget(m.employee_id)}
+                      className="h-8 w-8 text-red-600 bg-red-50 hover:bg-red-100 hover:text-red-700">
+                      <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </CardContent>
                 </Card>
@@ -448,6 +467,7 @@ export default function ProjectDetails() {
       <DeleteConfirmDialog open={!!reqDelete} onOpenChange={(o) => !o && setReqDelete(null)} onConfirm={async () => { await deleteRequirement(reqDelete!.id); setReqDelete(null); await load(); }} title={t("requirements.deleteRequirement")} description={t("requirements.deleteConfirm")} />
       <DeleteConfirmDialog open={!!logDelete} onOpenChange={(o) => !o && setLogDelete(null)} onConfirm={async () => { await deleteWorkLog(logDelete!.id); setLogDelete(null); await load(); }} title={t("workLogs.deleteWorkLog")} description={t("workLogs.deleteConfirm")} />
       <DeleteConfirmDialog open={!!hwDelete} onOpenChange={(o) => !o && setHwDelete(null)} onConfirm={async () => { await deleteHardwareCost(hwDelete!.id); setHwDelete(null); await load(); }} title={t("hardwareCosts.deleteCost")} description={t("hardwareCosts.deleteConfirm")} />
+      <DeleteConfirmDialog open={teamDeleteTarget !== null} onOpenChange={(o) => !o && setTeamDeleteTarget(null)} onConfirm={onUnassignEmployee} title={t("projectDetails.unassignEmployee")} description={t("projectDetails.unassignConfirm")} />
     </div>
   );
 }

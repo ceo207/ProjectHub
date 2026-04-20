@@ -91,7 +91,7 @@ export default function Employees() {
   const columns: ColumnDef<EmployeeWithStats>[] = [
     {
       accessorKey: "name",
-      header: ({ column }) => <SortableHeader column={column} label={t("employees.name")} />,
+      header: t("employees.name"),
     },
     {
       accessorKey: "role",
@@ -114,24 +114,26 @@ export default function Employees() {
     },
     {
       accessorKey: "totalEarnings",
-      header: t("employees.totalEarnings"),
+      header: ({ column }) => <SortableHeader column={column} label={t("employees.totalEarnings")} />,
       cell: ({ row }) => <span className="font-semibold text-emerald-600">{formatCurrency(row.original.totalEarnings)}</span>,
     },
     {
       accessorKey: "startDate",
-      header: t("employees.startDate"),
+      header: ({ column }) => <SortableHeader column={column} label={t("employees.startDate")} />,
       cell: ({ row }) => formatDate(row.original.startDate),
     },
     {
       id: "actions",
       header: t("common.actions"),
       cell: ({ row }) => (
-        <div className="flex gap-2">
-          <Button size="icon" variant="ghost" onClick={() => openEdit(row.original)}>
-            <Pencil className="h-4 w-4" />
+        <div className="flex gap-1.5 justify-center">
+          <Button size="icon" variant="ghost" onClick={() => openEdit(row.original)}
+            className="h-8 w-8 text-amber-600 bg-amber-50 hover:bg-amber-100 hover:text-amber-700">
+            <Pencil className="h-3.5 w-3.5" />
           </Button>
-          <Button size="icon" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => setDeleteTarget(row.original)}>
-            <Trash2 className="h-4 w-4" />
+          <Button size="icon" variant="ghost" onClick={() => setDeleteTarget(row.original)}
+            className="h-8 w-8 text-red-600 bg-red-50 hover:bg-red-100 hover:text-red-700">
+            <Trash2 className="h-3.5 w-3.5" />
           </Button>
         </div>
       ),

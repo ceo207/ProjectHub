@@ -23,6 +23,8 @@ interface DataTableProps<TData, TValue> {
   searchPlaceholder?: string;
   pageSize?: number;
   toolbar?: ReactNode;
+  onRowClick?: (row: TData) => void;
+  rowClassName?: string;
 }
 
 export function DataTable<TData, TValue>({
@@ -32,6 +34,8 @@ export function DataTable<TData, TValue>({
   searchPlaceholder,
   pageSize = 10,
   toolbar,
+  onRowClick,
+  rowClassName,
 }: DataTableProps<TData, TValue>) {
   const { t } = useTranslation();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -71,7 +75,7 @@ export function DataTable<TData, TValue>({
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} className="text-center" style={{ width: header.column.columnDef.size, minWidth: header.column.columnDef.minSize, maxWidth: header.column.columnDef.maxSize }}>
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
@@ -81,9 +85,14 @@ export function DataTable<TData, TValue>({
           <TableBody>
             {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+                  className={onRowClick ? `cursor-pointer transition-colors ${rowClassName ?? "hover:bg-muted/60"}` : undefined}
+                >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                    <TableCell key={cell.id} className="text-center" style={{ width: cell.column.columnDef.size, minWidth: cell.column.columnDef.minSize, maxWidth: cell.column.columnDef.maxSize }}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                   ))}
                 </TableRow>
               ))
@@ -97,18 +106,24 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-between text-sm text-muted-foreground">
+      <div className="flex items-center justify-center gap-3 text-sm text-muted-foreground">
+        <Button
+          variant="outline" size="sm"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+          className={table.getCanPreviousPage() ? "border-border text-foreground hover:bg-muted" : "border-border text-muted-foreground/30 cursor-not-allowed"}>
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
         <span>
           {t("common.page")} {table.getState().pagination.pageIndex + 1} {t("common.of")} {Math.max(1, table.getPageCount())}
         </span>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
+        <Button
+          variant="outline" size="sm"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+          className={table.getCanNextPage() ? "border-border text-foreground hover:bg-muted" : "border-border text-muted-foreground/30 cursor-not-allowed"}>
+          <ChevronRight className="h-4 w-4" />
+        </Button>
       </div>
     </div>
   );

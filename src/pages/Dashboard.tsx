@@ -4,16 +4,14 @@ import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer,
 } from "recharts";
-import { Users, FolderKanban, DollarSign, TrendingUp, Database } from "lucide-react";
+import { Users, FolderKanban, DollarSign, TrendingUp } from "lucide-react";
 import { StatCard } from "@/components/shared/StatCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { getDashboardStats, getMonthlyCosts, getProjectCostChart, getRecentWorkLogs } from "@/services/dashboard";
 import { getProjectsWithCosts } from "@/services/projects";
-import { isSeedNeeded, seedSampleData } from "@/services/seed";
 import type { DashboardStats, MonthlyCostData, ProjectWithCosts } from "@/types";
 
 export default function Dashboard() {
@@ -24,42 +22,28 @@ export default function Dashboard() {
   const [recentLogs, setRecentLogs] = useState<{ id: number; date: string; hours_worked: number; employee_name: string; project_name: string }[]>([]);
   const [projects, setProjects] = useState<ProjectWithCosts[]>([]);
   const [loading, setLoading] = useState(true);
-  const [seeding, setSeeding] = useState(false);
-  const [canSeed, setCanSeed] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [s, mc, pc, rl, pr, needsSeed] = await Promise.all([
+      const [s, mc, pc, rl, pr] = await Promise.all([
         getDashboardStats(),
         getMonthlyCosts(6),
         getProjectCostChart(),
         getRecentWorkLogs(5),
         getProjectsWithCosts(),
-        isSeedNeeded(),
       ]);
       setStats(s);
       setMonthlyCosts(mc);
       setProjectChart(pc);
       setRecentLogs(rl);
       setProjects(pr.slice(0, 5));
-      setCanSeed(needsSeed);
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => { load(); }, [load]);
-
-  const handleSeed = async () => {
-    setSeeding(true);
-    try {
-      await seedSampleData();
-      await load();
-    } finally {
-      setSeeding(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -71,16 +55,6 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      {canSeed && (
-        <div className="flex justify-end">
-          <Button variant="outline" size="sm" onClick={handleSeed} disabled={seeding} className="gap-2">
-            <Database className="h-4 w-4" />
-            {seeding ? t("seed.loading") : t("seed.loadSampleData")}
-          </Button>
-        </div>
-      )}
-
       {/* Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
