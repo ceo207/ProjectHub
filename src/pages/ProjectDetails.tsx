@@ -178,7 +178,7 @@ export default function ProjectDetails() {
         setTimeout(() => setImportReqResult(null), 5000);
       }
     } catch (e) {
-      setImportReqResult({ imported: 0, skipped: 0, errors: [String(e)] });
+      setImportReqResult({ imported: 0, updated: 0, skipped: 0, errors: [String(e)] });
     } finally { setImportingReqs(false); }
   };
 
