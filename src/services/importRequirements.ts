@@ -1,10 +1,12 @@
 import { open } from "@tauri-apps/plugin-dialog";
 import { readFile } from "@tauri-apps/plugin-fs";
 import * as XLSX from "xlsx";
-import { createRequirement } from "./requirements";
+import { createRequirement, updateRequirement } from "./requirements";
+import type { RequirementWithEmployee } from "../types";
 
 export type ImportReqResult = {
   imported: number;
+  updated: number;
   skipped: number;
   errors: string[];
 };
@@ -23,9 +25,14 @@ function cellNum(sheet: XLSX.WorkSheet, r: number, c: number): number {
   return Number(cell.v);
 }
 
+function normalize(s: string) {
+  return s.trim().toLowerCase();
+}
+
 export async function importRequirementsFromExcel(
   projectId: number,
-  teamMembers: { employee_id: number; name: string }[]
+  teamMembers: { employee_id: number; name: string }[],
+  existingRequirements: RequirementWithEmployee[]
 ): Promise<ImportReqResult | null> {
   const filePath = await open({
     title: "Select Requirements File",
@@ -40,10 +47,10 @@ export async function importRequirementsFromExcel(
   const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
   const ref = sheet["!ref"];
-  if (!ref) return { imported: 0, skipped: 0, errors: ["The file appears to be empty."] };
+  if (!ref) return { imported: 0, updated: 0, skipped: 0, errors: ["The file appears to be empty."] };
 
   const range = XLSX.utils.decode_range(ref);
-  const result: ImportReqResult = { imported: 0, skipped: 0, errors: [] };
+  const result: ImportReqResult = { imported: 0, updated: 0, skipped: 0, errors: [] };
 
   // Rows 0 = headers, 1 = hints — data starts at row index 2
   for (let r = 2; r <= range.e.r; r++) {
@@ -78,17 +85,35 @@ export async function importRequirementsFromExcel(
       }
     }
 
+    // Check if a requirement with the same section + title already exists
+    const existing = existingRequirements.find((req) => {
+      const sectionMatch = normalize(req.section ?? "") === normalize(section);
+      const titleMatch   = normalize(req.title) === normalize(title);
+      return sectionMatch && titleMatch;
+    });
+
     try {
-      await createRequirement({
-        projectId,
-        title,
-        description: description || undefined,
-        status,
-        progress,
-        section: section || null,
-        assignedEmployeeId,
-      });
-      result.imported++;
+      if (existing) {
+        await updateRequirement(existing.id, {
+          description: description || undefined,
+          status,
+          progress,
+          section: section || null,
+          assignedEmployeeId,
+        });
+        result.updated++;
+      } else {
+        await createRequirement({
+          projectId,
+          title,
+          description: description || undefined,
+          status,
+          progress,
+          section: section || null,
+          assignedEmployeeId,
+        });
+        result.imported++;
+      }
     } catch (e) {
       result.errors.push(`Row ${r + 1}: ${String(e)}`);
     }

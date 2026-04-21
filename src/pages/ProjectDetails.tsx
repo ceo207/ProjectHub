@@ -171,10 +171,10 @@ export default function ProjectDetails() {
     setImportingReqs(true);
     setImportReqResult(null);
     try {
-      const result = await importRequirementsFromExcel(projectId, teamMembers);
+      const result = await importRequirementsFromExcel(projectId, teamMembers, requirements);
       if (result) {
         setImportReqResult(result);
-        if (result.imported > 0) await load();
+        if (result.imported > 0 || result.updated > 0) await load();
         setTimeout(() => setImportReqResult(null), 5000);
       }
     } catch (e) {
@@ -317,18 +317,21 @@ export default function ProjectDetails() {
         <TabsContent value="requirements" className="space-y-4">
           {importReqResult && (
             <div className={`flex items-start gap-3 rounded-lg border px-4 py-3 text-sm ${
-              importReqResult.errors.length > 0 || importReqResult.imported === 0
+              importReqResult.errors.length > 0 || (importReqResult.imported === 0 && importReqResult.updated === 0)
                 ? "border-red-200 bg-red-50 text-red-800"
                 : "border-emerald-200 bg-emerald-50 text-emerald-800"
             }`}>
-              {importReqResult.imported > 0 && importReqResult.errors.length === 0
+              {(importReqResult.imported > 0 || importReqResult.updated > 0) && importReqResult.errors.length === 0
                 ? <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0" />
                 : <XCircle className="h-4 w-4 mt-0.5 shrink-0 text-red-600" />}
               <div className="flex-1">
                 {importReqResult.imported > 0 && (
-                  <p className="font-medium">Successfully imported {importReqResult.imported} requirement{importReqResult.imported !== 1 ? "s" : ""}.</p>
+                  <p className="font-medium">Successfully added {importReqResult.imported} new requirement{importReqResult.imported !== 1 ? "s" : ""}.</p>
                 )}
-                {importReqResult.imported === 0 && importReqResult.errors.length === 0 && (
+                {importReqResult.updated > 0 && (
+                  <p className="font-medium">Successfully updated {importReqResult.updated} existing requirement{importReqResult.updated !== 1 ? "s" : ""}.</p>
+                )}
+                {importReqResult.imported === 0 && importReqResult.updated === 0 && importReqResult.errors.length === 0 && (
                   <p className="font-medium">No rows were imported. Make sure the Title column is filled and data starts from row 3.</p>
                 )}
                 {importReqResult.errors.map((e, i) => <p key={i} className="text-red-700">{e}</p>)}
