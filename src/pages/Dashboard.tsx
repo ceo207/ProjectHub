@@ -37,7 +37,7 @@ export default function Dashboard() {
       setMonthlyCosts(mc);
       setProjectChart(pc);
       setRecentLogs(rl);
-      setProjects(pr.slice(0, 5));
+      setProjects(pr);
     } finally {
       setLoading(false);
     }
@@ -69,18 +69,52 @@ export default function Dashboard() {
           subtitle={`${stats?.activeProjects ?? 0} ${t("status.active")}`}
           icon={<FolderKanban className="h-5 w-5" />}
         />
-        <StatCard
-          title={t("dashboard.totalCost")}
-          value={formatCurrency(stats?.totalCost ?? 0)}
-          subtitle={t("dashboard.totalCost")}
-          icon={<DollarSign className="h-5 w-5" />}
-        />
-        <StatCard
-          title={t("dashboard.monthlyCost")}
-          value={formatCurrency(stats?.monthlyCost ?? 0)}
-          subtitle={t("dashboard.monthlyCost")}
-          icon={<TrendingUp className="h-5 w-5" />}
-        />
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between">
+              <div className="space-y-1 flex-1">
+                <p className="text-sm font-medium text-muted-foreground">{t("dashboard.totalCost")}</p>
+                <p className="text-2xl font-bold tracking-tight">{formatCurrency(stats?.totalCost ?? 0)}</p>
+                <div className="flex flex-col gap-0.5 pt-1">
+                  <p className="text-xs text-muted-foreground">
+                    <span className="text-blue-500 font-medium">{t("dashboard.totalCodingCost")}: </span>
+                    {formatCurrency(projects.reduce((s, p) => s + p.laborCost, 0))}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    <span className="text-emerald-600 font-medium">{t("dashboard.totalHardwareCost")}: </span>
+                    {formatCurrency(projects.reduce((s, p) => s + p.hardwareCost, 0))}
+                  </p>
+                </div>
+              </div>
+              <div className="rounded-full bg-primary/10 p-3 text-primary">
+                <DollarSign className="h-5 w-5" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between">
+              <div className="space-y-1 flex-1">
+                <p className="text-sm font-medium text-muted-foreground">{t("dashboard.monthlyCost")}</p>
+                <p className="text-2xl font-bold tracking-tight">{formatCurrency(stats?.monthlyCost ?? 0)}</p>
+                <div className="flex flex-col gap-0.5 pt-1">
+                  <p className="text-xs text-muted-foreground">
+                    <span className="text-blue-500 font-medium">{t("dashboard.totalCodingCost")}: </span>
+                    {formatCurrency(stats?.monthlyLaborCost ?? 0)}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    <span className="text-emerald-600 font-medium">{t("dashboard.totalHardwareCost")}: </span>
+                    {formatCurrency(stats?.monthlyHardwareCost ?? 0)}
+                  </p>
+                </div>
+              </div>
+              <div className="rounded-full bg-primary/10 p-3 text-primary">
+                <TrendingUp className="h-5 w-5" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Charts Row */}
@@ -148,7 +182,7 @@ export default function Dashboard() {
             {projects.length === 0 ? (
               <p className="text-sm text-muted-foreground">{t("dashboard.noProjectsYet")}</p>
             ) : (
-              projects.map((p) => (
+              projects.slice(0, 5).map((p) => (
                 <div key={p.id} className="space-y-1.5">
                   <div className="flex items-center justify-between text-sm">
                     <span className="font-medium truncate max-w-[60%]">{p.name}</span>

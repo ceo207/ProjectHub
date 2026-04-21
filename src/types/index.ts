@@ -41,6 +41,7 @@ export interface Requirement {
   status: RequirementStatus;
   assignedEmployeeId?: number | null;
   progress: number;
+  section?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -98,6 +99,7 @@ export interface HardwareCostWithProject extends HardwareCost {
 
 export interface RequirementWithEmployee extends Requirement {
   employeeName?: string | null;
+  section?: string | null;
 }
 
 export interface DashboardStats {
@@ -107,6 +109,8 @@ export interface DashboardStats {
   activeProjects: number;
   totalCost: number;
   monthlyCost: number;
+  monthlyLaborCost: number;
+  monthlyHardwareCost: number;
 }
 
 export interface MonthlyCostData {

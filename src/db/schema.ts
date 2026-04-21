@@ -53,6 +53,7 @@ export const requirements = sqliteTable("requirements", {
     { onDelete: "set null" }
   ),
   progress: integer("progress").notNull().default(0),
+  section: text("section"),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),
 });

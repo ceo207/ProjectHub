@@ -9,6 +9,7 @@ export type NewRequirementInput = {
   status: "todo" | "in_progress" | "done";
   assignedEmployeeId?: number | null;
   progress: number;
+  section?: string | null;
 };
 
 export async function getRequirementsByProject(projectId: number): Promise<RequirementWithEmployee[]> {
@@ -20,6 +21,7 @@ export async function getRequirementsByProject(projectId: number): Promise<Requi
     status: string;
     assigned_employee_id: number | null;
     progress: number;
+    section: string | null;
     created_at: string;
     updated_at: string;
     employee_name: string | null;
@@ -28,7 +30,7 @@ export async function getRequirementsByProject(projectId: number): Promise<Requi
      FROM requirements r
      LEFT JOIN employees e ON e.id = r.assigned_employee_id
      WHERE r.project_id = ?
-     ORDER BY r.created_at`,
+     ORDER BY r.section NULLS FIRST, r.created_at`,
     [projectId]
   );
 
@@ -40,6 +42,7 @@ export async function getRequirementsByProject(projectId: number): Promise<Requi
     status: r.status as "todo" | "in_progress" | "done",
     assignedEmployeeId: r.assigned_employee_id,
     progress: r.progress,
+    section: r.section,
     createdAt: r.created_at,
     updatedAt: r.updated_at,
     employeeName: r.employee_name,
@@ -49,9 +52,9 @@ export async function getRequirementsByProject(projectId: number): Promise<Requi
 export async function createRequirement(data: NewRequirementInput) {
   const now = nowISO();
   return getSQLite().execute(
-    `INSERT INTO requirements (project_id, title, description, status, assigned_employee_id, progress, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [data.projectId, data.title, data.description ?? null, data.status, data.assignedEmployeeId ?? null, data.progress, now, now]
+    `INSERT INTO requirements (project_id, title, description, status, assigned_employee_id, progress, section, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [data.projectId, data.title, data.description ?? null, data.status, data.assignedEmployeeId ?? null, data.progress, data.section ?? null, now, now]
   );
 }
 
@@ -65,6 +68,7 @@ export async function updateRequirement(id: number, data: Partial<Omit<NewRequir
   if (data.status !== undefined) { fields.push("status = ?"); values.push(data.status); }
   if ("assignedEmployeeId" in data) { fields.push("assigned_employee_id = ?"); values.push(data.assignedEmployeeId ?? null); }
   if (data.progress !== undefined) { fields.push("progress = ?"); values.push(data.progress); }
+  if ("section" in data) { fields.push("section = ?"); values.push(data.section ?? null); }
 
   fields.push("updated_at = ?");
   values.push(now);

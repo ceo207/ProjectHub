@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowLeft, PlusCircle, Trash2, Pencil, UserPlus } from "lucide-react";
+import { ArrowLeft, PlusCircle, Trash2, Pencil, UserPlus, Upload, CheckCircle2, XCircle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,7 +23,10 @@ import { formatCurrency, formatDate, todayDate } from "@/lib/utils";
 import { getProjectById, getProjectCosts, getProjectEmployees, assignEmployeeToProject, unassignEmployeeFromProject } from "@/services/projects";
 import { getAllEmployees } from "@/services/employees";
 import { getRequirementsByProject, createRequirement, updateRequirement, deleteRequirement } from "@/services/requirements";
+import { importRequirementsFromExcel } from "@/services/importRequirements";
+import type { ImportReqResult } from "@/services/importRequirements";
 import { getWorkLogsByProject, createWorkLog, updateWorkLog, deleteWorkLog } from "@/services/workLogs";
+import { toast } from "@/hooks/use-toast";
 import { getHardwareCostsByProject, createHardwareCost, updateHardwareCost, deleteHardwareCost } from "@/services/hardwareCosts";
 import type { Project, RequirementWithEmployee, WorkLogWithNames, HardwareCostWithProject, Employee } from "@/types";
 
@@ -57,6 +60,8 @@ export default function ProjectDetails() {
   const [teamDeleteTarget, setTeamDeleteTarget] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState("requirements");
   const [saving, setSaving] = useState(false);
+  const [importingReqs, setImportingReqs] = useState(false);
+  const [importReqResult, setImportReqResult] = useState<ImportReqResult | null>(null);
 
   // Forms
   const reqSchema = z.object({
@@ -65,6 +70,7 @@ export default function ProjectDetails() {
     status: z.enum(["todo", "in_progress", "done"]),
     assignedEmployeeId: z.coerce.number().optional().nullable(),
     progress: z.coerce.number().min(0).max(100),
+    section: z.string().optional(),
   });
   const logSchema = z.object({
     employeeId: z.coerce.number().min(1, t("validation.required")),
@@ -80,7 +86,7 @@ export default function ProjectDetails() {
   });
 
   type ReqFormValues = z.infer<typeof reqSchema>;
-  const reqForm = useForm<ReqFormValues>({ resolver: zodResolver(reqSchema), defaultValues: { title: "", description: "", status: "todo", assignedEmployeeId: null, progress: 0 } });
+  const reqForm = useForm<ReqFormValues>({ resolver: zodResolver(reqSchema), defaultValues: { title: "", description: "", status: "todo", assignedEmployeeId: null, progress: 0, section: "" } });
   const logForm = useForm({ resolver: zodResolver(logSchema), defaultValues: { employeeId: 0, date: todayDate(), hoursWorked: 8, notes: "" } });
   const hwForm  = useForm({ resolver: zodResolver(hwSchema), defaultValues: { itemName: "", quantity: 1, unitPrice: 0, purchaseDate: todayDate() } });
 
@@ -116,10 +122,13 @@ export default function ProjectDetails() {
   const onSaveReq = async (values: z.infer<typeof reqSchema>) => {
     setSaving(true);
     try {
+      const payload = { ...values, assignedEmployeeId: values.assignedEmployeeId ?? null, section: values.section?.trim() || null };
       if (reqEdit) {
-        await updateRequirement(reqEdit.id, { ...values, assignedEmployeeId: values.assignedEmployeeId ?? null });
+        await updateRequirement(reqEdit.id, payload);
+        toast(t("common.updatedSuccessfully"));
       } else {
-        await createRequirement({ ...values, projectId, assignedEmployeeId: values.assignedEmployeeId ?? null });
+        await createRequirement({ ...payload, projectId });
+        toast(t("common.addedSuccessfully"));
       }
       setReqDialog(false);
       await load();
@@ -130,8 +139,13 @@ export default function ProjectDetails() {
   const onSaveLog = async (values: z.infer<typeof logSchema>) => {
     setSaving(true);
     try {
-      if (logEdit) { await updateWorkLog(logEdit.id, values); }
-      else { await createWorkLog({ ...values, projectId }); }
+      if (logEdit) {
+        await updateWorkLog(logEdit.id, values);
+        toast(t("common.updatedSuccessfully"));
+      } else {
+        await createWorkLog({ ...values, projectId });
+        toast(t("common.addedSuccessfully"));
+      }
       setLogDialog(false);
       await load();
     } finally { setSaving(false); }
@@ -141,16 +155,37 @@ export default function ProjectDetails() {
   const onSaveHw = async (values: z.infer<typeof hwSchema>) => {
     setSaving(true);
     try {
-      if (hwEdit) { await updateHardwareCost(hwEdit.id, values); }
-      else { await createHardwareCost({ ...values, projectId }); }
+      if (hwEdit) {
+        await updateHardwareCost(hwEdit.id, values);
+        toast(t("common.updatedSuccessfully"));
+      } else {
+        await createHardwareCost({ ...values, projectId });
+        toast(t("common.addedSuccessfully"));
+      }
       setHwDialog(false);
       await load();
     } finally { setSaving(false); }
   };
 
+  const onImportReqs = async () => {
+    setImportingReqs(true);
+    setImportReqResult(null);
+    try {
+      const result = await importRequirementsFromExcel(projectId, teamMembers);
+      if (result) {
+        setImportReqResult(result);
+        if (result.imported > 0) await load();
+        setTimeout(() => setImportReqResult(null), 5000);
+      }
+    } catch (e) {
+      setImportReqResult({ imported: 0, skipped: 0, errors: [String(e)] });
+    } finally { setImportingReqs(false); }
+  };
+
   const onAssignEmployee = async () => {
     if (!assignEmpId) return;
     await assignEmployeeToProject(projectId, Number(assignEmpId));
+    toast(t("common.assignedSuccessfully"));
     setAssignDialog(false);
     setAssignEmpId("");
     setActiveTab("team");
@@ -172,6 +207,7 @@ export default function ProjectDetails() {
   const unassignedEmployees = allEmployees.filter((e) => !teamMembers.some((tm) => tm.employee_id === e.id));
 
   const reqColumns: ColumnDef<RequirementWithEmployee>[] = [
+    { accessorKey: "section", header: t("requirements.section"), cell: ({ row }) => row.original.section ? <span className="font-medium text-primary">{row.original.section}</span> : <span className="text-muted-foreground">—</span> },
     { accessorKey: "title", header: t("requirements.taskTitle") },
     { accessorKey: "description", header: t("requirements.description"), cell: ({ row }) => <span>{row.original.description ?? "-"}</span> },
     { accessorKey: "status", header: t("requirements.status"), cell: ({ row }) => <StatusBadge status={row.original.status} /> },
@@ -184,7 +220,7 @@ export default function ProjectDetails() {
     )},
     { id: "actions", header: t("common.actions"), cell: ({ row }) => (
       <div className="flex gap-1.5 justify-center">
-        <Button size="icon" variant="ghost" onClick={() => { setReqEdit(row.original); reqForm.reset({ title: row.original.title, description: row.original.description ?? "", status: row.original.status, assignedEmployeeId: row.original.assignedEmployeeId ?? null, progress: row.original.progress }); setReqDialog(true); }}
+        <Button size="icon" variant="ghost" onClick={() => { setReqEdit(row.original); reqForm.reset({ title: row.original.title, description: row.original.description ?? "", status: row.original.status, assignedEmployeeId: row.original.assignedEmployeeId ?? null, progress: row.original.progress, section: row.original.section ?? "" }); setReqDialog(true); }}
           className="h-8 w-8 text-amber-600 bg-amber-50 hover:bg-amber-100 hover:text-amber-700"><Pencil className="h-3.5 w-3.5" /></Button>
         <Button size="icon" variant="ghost" onClick={() => setReqDelete(row.original)}
           className="h-8 w-8 text-red-600 bg-red-50 hover:bg-red-100 hover:text-red-700"><Trash2 className="h-3.5 w-3.5" /></Button>
@@ -279,13 +315,41 @@ export default function ProjectDetails() {
 
         {/* Requirements */}
         <TabsContent value="requirements" className="space-y-4">
-          <div className="flex justify-end">
-            <Button size="sm" className="gap-2" onClick={() => { setReqEdit(null); reqForm.reset({ title: "", description: "", status: "todo", assignedEmployeeId: null, progress: 0 }); setReqDialog(true); }}>
+          {importReqResult && (
+            <div className={`flex items-start gap-3 rounded-lg border px-4 py-3 text-sm ${
+              importReqResult.errors.length > 0 || importReqResult.imported === 0
+                ? "border-red-200 bg-red-50 text-red-800"
+                : "border-emerald-200 bg-emerald-50 text-emerald-800"
+            }`}>
+              {importReqResult.imported > 0 && importReqResult.errors.length === 0
+                ? <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0" />
+                : <XCircle className="h-4 w-4 mt-0.5 shrink-0 text-red-600" />}
+              <div className="flex-1">
+                {importReqResult.imported > 0 && (
+                  <p className="font-medium">Successfully imported {importReqResult.imported} requirement{importReqResult.imported !== 1 ? "s" : ""}.</p>
+                )}
+                {importReqResult.imported === 0 && importReqResult.errors.length === 0 && (
+                  <p className="font-medium">No rows were imported. Make sure the Title column is filled and data starts from row 3.</p>
+                )}
+                {importReqResult.errors.map((e, i) => <p key={i} className="text-red-700">{e}</p>)}
+              </div>
+              <button onClick={() => setImportReqResult(null)} className="text-muted-foreground hover:text-foreground">✕</button>
+            </div>
+          )}
+          <div className="flex justify-end gap-2">
+            <Button size="sm" variant="outline" onClick={onImportReqs} disabled={importingReqs} className="gap-2">
+              <Upload className="h-4 w-4" />
+              {importingReqs ? t("requirements.importing") : t("requirements.importRequirements")}
+            </Button>
+            <Button size="sm" className="gap-2" onClick={() => { setReqEdit(null); reqForm.reset({ title: "", description: "", status: "todo", assignedEmployeeId: null, progress: 0, section: "" }); setReqDialog(true); }}>
               <PlusCircle className="h-4 w-4" />{t("projectDetails.addRequirement")}
             </Button>
           </div>
-          {requirements.length === 0 ? <p className="text-muted-foreground text-sm py-8 text-center">{t("projectDetails.noRequirements")}</p> :
-            <DataTable columns={reqColumns} data={requirements} />}
+          {requirements.length === 0 ? (
+            <p className="text-muted-foreground text-sm py-8 text-center">{t("projectDetails.noRequirements")}</p>
+          ) : (
+            <DataTable columns={reqColumns} data={requirements} />
+          )}
         </TabsContent>
 
         {/* Team */}
@@ -345,6 +409,20 @@ export default function ProjectDetails() {
           <DialogHeader><DialogTitle>{reqEdit ? t("requirements.editRequirement") : t("requirements.addRequirement")}</DialogTitle></DialogHeader>
           <Form {...reqForm}>
             <form onSubmit={reqForm.handleSubmit(onSaveReq)} className="space-y-4">
+              <FormField control={reqForm.control} name="section" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("requirements.section")}</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder={t("requirements.sectionPlaceholder")} list="section-suggestions" />
+                  </FormControl>
+                  <datalist id="section-suggestions">
+                    {[...new Set(requirements.map(r => r.section).filter(Boolean))].map((s) => (
+                      <option key={s} value={s!} />
+                    ))}
+                  </datalist>
+                  <FormMessage />
+                </FormItem>
+              )} />
               <FormField control={reqForm.control} name="title" render={({ field }) => (
                 <FormItem><FormLabel>{t("requirements.taskTitle")}</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
               )} />
@@ -370,7 +448,7 @@ export default function ProjectDetails() {
                     <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                     <SelectContent>
                       <SelectItem value="none">{t("requirements.unassigned")}</SelectItem>
-                      {allEmployees.map((e) => <SelectItem key={e.id} value={String(e.id)}>{e.name}</SelectItem>)}
+                      {teamMembers.map((m) => <SelectItem key={m.employee_id} value={String(m.employee_id)}>{m.name}</SelectItem>)}
                     </SelectContent>
                   </Select><FormMessage /></FormItem>
               )} />

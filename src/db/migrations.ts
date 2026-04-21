@@ -75,8 +75,15 @@ const DDL_STATEMENTS = [
   `CREATE INDEX IF NOT EXISTS idx_hardware_project   ON hardware_costs(project_id)`,
 ];
 
+const ALTER_STATEMENTS = [
+  `ALTER TABLE requirements ADD COLUMN section TEXT`,
+];
+
 export async function runMigrations(db: Database): Promise<void> {
   for (const stmt of DDL_STATEMENTS) {
     await db.execute(stmt, []);
+  }
+  for (const stmt of ALTER_STATEMENTS) {
+    try { await db.execute(stmt, []); } catch { /* column already exists */ }
   }
 }

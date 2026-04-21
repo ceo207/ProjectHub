@@ -43,6 +43,8 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     activeProjects: proj.active,
     totalCost: cost.labor + cost.hardware,
     monthlyCost: month.labor + month.hardware,
+    monthlyLaborCost: month.labor,
+    monthlyHardwareCost: month.hardware,
   };
 }
 

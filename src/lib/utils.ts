@@ -14,22 +14,7 @@ export function formatCurrency(amount: number, currency = "$"): string {
 
 export function formatDate(dateStr: string): string {
   if (!dateStr) return "-";
-  const date = new Date(dateStr);
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
-export function formatDateAr(dateStr: string): string {
-  if (!dateStr) return "-";
-  const date = new Date(dateStr);
-  return date.toLocaleDateString("ar-EG", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+  return dateStr.slice(0, 10);
 }
 
 export function nowISO(): string {

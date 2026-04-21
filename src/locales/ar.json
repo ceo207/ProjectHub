@@ -26,6 +26,7 @@
     "search": "بحث...",
     "filter": "تصفية",
     "clear": "مسح",
+    "clearFilters": "مسح الفلاتر",
     "loading": "جارٍ التحميل...",
     "noData": "لا توجد بيانات",
     "confirm": "تأكيد",
@@ -52,7 +53,10 @@
     "next": "التالي",
     "showing": "عرض {{from}}-{{to}} من {{total}}",
     "selectOption": "اختر خياراً",
-    "optional": "اختياري"
+    "optional": "اختياري",
+    "addedSuccessfully": "تمت الإضافة بنجاح",
+    "updatedSuccessfully": "تم التحديث بنجاح",
+    "assignedSuccessfully": "تم تعيين الموظف بنجاح"
   },
   "status": {
     "active": "نشط",
@@ -80,8 +84,10 @@
     "topProjects": "أعلى المشاريع تكلفةً",
     "employees": "موظف",
     "projects": "مشروع",
-    "laborCost": "العمالة",
+    "laborCost": "تكلفة البرمجة",
     "hardwareCost": "الأجهزة",
+    "totalCodingCost": "تكلفة البرمجة",
+    "totalHardwareCost": "تكلفة الأجهزة",
     "noProjectsYet": "لا توجد مشاريع بعد",
     "noLogsYet": "لا توجد سجلات عمل بعد"
   },
@@ -106,6 +112,7 @@
   "projects": {
     "title": "المشاريع",
     "addProject": "إضافة مشروع",
+    "downloadReqTemplate": "نموذج المتطلبات",
     "editProject": "تعديل المشروع",
     "deleteProject": "حذف المشروع",
     "deleteConfirm": "هل أنت متأكد من حذف هذا المشروع؟ ستُحذف جميع البيانات المرتبطة به.",
@@ -115,7 +122,7 @@
     "startDate": "تاريخ البدء",
     "status": "الحالة",
     "estimatedBudget": "الميزانية المقدرة",
-    "laborCost": "تكلفة العمالة",
+    "laborCost": "تكلفة البرمجة",
     "hardwareCost": "تكلفة الأجهزة",
     "totalCost": "إجمالي التكلفة",
     "progress": "التقدم",
@@ -139,7 +146,7 @@
     "noRequirements": "لا توجد متطلبات بعد",
     "noWorkLogs": "لا توجد سجلات عمل لهذا المشروع",
     "noHardwareCosts": "لا توجد تكاليف أجهزة مسجلة",
-    "laborCost": "تكلفة العمالة",
+    "laborCost": "تكلفة البرمجة",
     "hardwareCost": "تكلفة الأجهزة",
     "totalCost": "إجمالي التكلفة",
     "completion": "نسبة الإنجاز",
@@ -149,6 +156,8 @@
   },
   "requirements": {
     "addRequirement": "إضافة متطلب",
+    "importRequirements": "استيراد المتطلبات",
+    "importing": "جارٍ الاستيراد...",
     "editRequirement": "تعديل المتطلب",
     "deleteRequirement": "حذف المتطلب",
     "deleteConfirm": "حذف هذا المتطلب؟",
@@ -159,7 +168,10 @@
     "progress": "نسبة التقدم (%)",
     "unassigned": "غير مُعيَّن",
     "selectEmployee": "اختر موظفاً",
-    "selectStatus": "اختر الحالة"
+    "selectStatus": "اختر الحالة",
+    "section": "القسم",
+    "sectionPlaceholder": "مثال: الواجهة، الخادم...",
+    "noSection": "عام"
   },
   "workLogs": {
     "title": "سجلات العمل",
@@ -177,7 +189,13 @@
     "selectEmployee": "اختر موظفاً",
     "selectProject": "اختر مشروعاً",
     "filterByEmployee": "تصفية بالموظف",
-    "filterByProject": "تصفية بالمشروع"
+    "filterByProject": "تصفية بالمشروع",
+    "importTimesheet": "استيراد جدول الحضور",
+    "importing": "جارٍ الاستيراد...",
+    "filterMonth": "الشهر",
+    "allEmployees": "جميع الموظفين",
+    "allProjects": "جميع المشاريع",
+    "totalEarning": "إجمالي الأرباح"
   },
   "hardwareCosts": {
     "title": "تكاليف الأجهزة",
@@ -203,6 +221,7 @@
   "validation": {
     "required": "هذا الحقل مطلوب",
     "positiveNumber": "يجب أن يكون رقماً موجباً",
+    "oneDecimal": "استخدم رقماً عشرياً واحداً كحد أقصى (مثال: 7.5)",
     "invalidDate": "تاريخ غير صالح",
     "minValue": "يجب أن يكون على الأقل {{min}}",
     "maxValue": "يجب أن يكون على الأكثر {{max}}",

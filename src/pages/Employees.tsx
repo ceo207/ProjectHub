@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { formatCurrency, formatDate, todayDate } from "@/lib/utils";
 import { createEmployee, updateEmployee, deleteEmployee, getEmployeesWithStats } from "@/services/employees";
+import { toast } from "@/hooks/use-toast";
 import { downloadWorkingHoursTemplate } from "@/services/workingHoursTemplate";
 import type { EmployeeWithStats } from "@/types";
 
@@ -71,8 +72,10 @@ export default function Employees() {
     try {
       if (editTarget) {
         await updateEmployee(editTarget.id, values);
+        toast(t("common.updatedSuccessfully"));
       } else {
         await createEmployee(values);
+        toast(t("common.addedSuccessfully"));
       }
       setDialogOpen(false);
       await load();

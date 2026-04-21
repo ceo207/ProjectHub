@@ -81,7 +81,7 @@ export default function Sidebar() {
 
       {/* Footer */}
       <div className="px-6 py-4 border-t border-[hsl(var(--sidebar-border))]">
-        <p className="text-xs text-[hsl(var(--sidebar-foreground))]/40">v1.0.0</p>
+        <p className="text-xs text-[hsl(var(--sidebar-foreground))]/40">v1.3.0</p>
       </div>
     </aside>
   );

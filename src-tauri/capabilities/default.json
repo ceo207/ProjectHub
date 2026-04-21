@@ -15,9 +15,11 @@
     "sql:allow-load",
     "sql:allow-close",
     "dialog:allow-save",
+    "dialog:allow-open",
     "fs:allow-read-file",
     "fs:allow-write-file",
     "fs:allow-write",
+    "fs:scope-home-recursive",
     "fs:scope-download-recursive",
     "fs:scope-resource-recursive"
   ]

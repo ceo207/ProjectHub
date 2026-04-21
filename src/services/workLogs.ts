@@ -1,5 +1,6 @@
 import { getSQLite } from "../db";
 import { nowISO } from "../lib/utils";
+import { assignEmployeeToProject } from "./projects";
 import type { WorkLogWithNames } from "../types";
 
 export type NewWorkLogInput = {
@@ -85,11 +86,12 @@ export async function getWorkLogsByProject(projectId: number): Promise<WorkLogWi
 
 export async function createWorkLog(data: NewWorkLogInput) {
   const now = nowISO();
-  return getSQLite().execute(
+  await getSQLite().execute(
     `INSERT INTO work_logs (employee_id, project_id, date, hours_worked, notes, created_at)
      VALUES (?, ?, ?, ?, ?, ?)`,
     [data.employeeId, data.projectId, data.date, data.hoursWorked, data.notes ?? null, now]
   );
+  await assignEmployeeToProject(data.projectId, data.employeeId);
 }
 
 export async function updateWorkLog(id: number, data: Partial<NewWorkLogInput>) {

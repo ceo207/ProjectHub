@@ -5,7 +5,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { PlusCircle, Pencil, Trash2 } from "lucide-react";
+import { PlusCircle, Pencil, Trash2, Download } from "lucide-react";
 import { DataTable, SortableHeader } from "@/components/shared/DataTable";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
@@ -18,6 +18,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Progress } from "@/components/ui/progress";
 import { formatCurrency, formatDate, todayDate } from "@/lib/utils";
 import { getProjectsWithCosts, createProject, updateProject, deleteProject } from "@/services/projects";
+import { toast } from "@/hooks/use-toast";
+import { downloadRequirementsTemplate } from "@/services/requirementsTemplate";
 import type { ProjectWithCosts } from "@/types";
 
 const projectSchema = (t: (k: string) => string) =>
@@ -71,8 +73,10 @@ export default function Projects() {
     try {
       if (editTarget) {
         await updateProject(editTarget.id, values);
+        toast(t("common.updatedSuccessfully"));
       } else {
         await createProject(values);
+        toast(t("common.addedSuccessfully"));
       }
       setDialogOpen(false);
       await load();
@@ -157,10 +161,16 @@ export default function Projects() {
           searchKey="name"
           searchPlaceholder={t("common.search")}
           toolbar={
-            <Button onClick={openAdd} className="gap-2">
-              <PlusCircle className="h-4 w-4" />
-              {t("projects.addProject")}
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => downloadRequirementsTemplate()} className="gap-2">
+                <Download className="h-4 w-4" />
+                {t("projects.downloadReqTemplate")}
+              </Button>
+              <Button onClick={openAdd} className="gap-2">
+                <PlusCircle className="h-4 w-4" />
+                {t("projects.addProject")}
+              </Button>
+            </div>
           }
           onRowClick={(p) => navigate(`/projects/${p.id}`)}
           rowClassName="hover:bg-blue-50 hover:[box-shadow:inset_4px_0_0_#60a5fa]"

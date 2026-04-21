@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { formatCurrency, formatDate, todayDate } from "@/lib/utils";
 import { getAllHardwareCosts, createHardwareCost, updateHardwareCost, deleteHardwareCost } from "@/services/hardwareCosts";
+import { toast } from "@/hooks/use-toast";
 import { getAllProjects } from "@/services/projects";
 import type { HardwareCostWithProject, Project } from "@/types";
 
@@ -70,8 +71,13 @@ export default function HardwareCosts() {
   const onSubmit = async (values: HardwareFormValues) => {
     setSaving(true);
     try {
-      if (editTarget) { await updateHardwareCost(editTarget.id, values); }
-      else { await createHardwareCost(values); }
+      if (editTarget) {
+        await updateHardwareCost(editTarget.id, values);
+        toast(t("common.updatedSuccessfully"));
+      } else {
+        await createHardwareCost(values);
+        toast(t("common.addedSuccessfully"));
+      }
       setDialogOpen(false);
       await load();
     } finally { setSaving(false); }
